@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Split Bill Simpel</title>
+    <!-- Menggunakan Tailwind CSS untuk tampilan yang modern dan responsif -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center text-indigo-600 mb-6">💸 PatunganYuk! (Split Bill)</h1>
+        
+        <!-- Input Total Tagihan -->
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-semibold mb-2" for="totalBill">
+                Total Tagihan (Rp)
+            </label>
+            <input type="number" id="totalBill" placeholder="Masukkan total semua tagihan" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Input Jumlah Orang -->
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-semibold mb-2" for="numPeople">
+                Jumlah Orang
+            </label>
+            <input type="number" id="numPeople" placeholder="Berapa orang yang ikut bayar?" min="1"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Input Tip / Pajak (Opsional) -->
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-semibold mb-2" for="tipPercentage">
+                Pajak / Tip / Service Charge (%)
+            </label>
+            <input type="number" id="tipPercentage" placeholder="0" min="0" value="0"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Tombol Hitung -->
+        <button onclick="calculateSplit()" 
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition duration-200">
+            Hitung Patungan
+        </button>
+
+        <!-- Tempat Menampilkan Hasil -->
+        <div id="resultCard" class="hidden mt-6 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+            <h2 class="text-sm font-semibold text-indigo-800 uppercase tracking-wider mb-3">Hasil Perhitungan:</h2>
+            <div class="flex justify-between py-1 text-gray-600">
+                <span>Total + Pajak:</span>
+                <span id="resTotalBill" class="font-medium">Rp 0</span>
+            </div>
+            <div class="flex justify-between py-2 border-t border-indigo-200 mt-2 text-lg font-bold text-gray-800">
+                <span>Per Orang Bayar:</span>
+                <span id="resPerPerson" class="text-indigo-600">Rp 0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logika JavaScript untuk Perhitungan -->
+    <script>
+        function calculateSplit() {
+            // Mengambil nilai dari input
+            const totalBill = parseFloat(document.getElementById('totalBill').value);
+            const numPeople = parseInt(document.getElementById('numPeople').value);
+            const tipPercentage = parseFloat(document.getElementById('tipPercentage').value) || 0;
+
+            // Validasi input agar tidak kosong atau minus
+            if (isNaN(totalBill) || totalBill <= 0) {
+                alert("Harap masukkan total tagihan yang valid!");
+                return;
+            }
+            if (isNaN(numPeople) || numPeople <= 0) {
+                alert("Jumlah orang minimal harus 1 orang!");
+                return;
+            }
+
+            // Hitung total akhir termasuk persen pajak/tip
+            const tipAmount = totalBill * (tipPercentage / 100);
+            const finalTotal = totalBill + tipAmount;
+            
+            // Hitung pembagian per orang
+            const sharePerPerson = finalTotal / numPeople;
+
+            // Format angka ke format mata uang Rupiah (IDR)
+            const formatter = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+            });
+
+            // Tampilkan hasil ke halaman web
+            document.getElementById('resTotalBill').innerText = formatter.format(finalTotal);
+            document.getElementById('resPerPerson').innerText = formatter.format(sharePerPerson);
+
+            // Munculkan kotak hasil (menghilangkan class 'hidden')
+            document.getElementById('resultCard').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+Fitur yang ada di website ini:
+Desain Bagus & Responsif: Tampilannya rapi kalau dibuka di HP maupun Laptop karena menggunakan Tailwind CSS.
+
+Perhitungan Pajak/Tip: Bisa memasukkan biaya tambahan seperti pajak restoran atau service charge dalam bentuk persen (%).
+
+Format Rupiah Otomatis: Hasil akhir akan otomatis diformat menjadi Rupiah yang rapi (contoh: Rp 25.000), bukan sekadar angka biasa.
+
+Validasi Keamanan: Mencegah eror jika pengguna lupa mengisi data atau memasukkan angka minus.
+
+Bil kaya habis brp org,brp uang / bil belanja
+
+Siap! Berarti kamu butuh fitur split bill yang lebih detail: bisa mencatat total belanjaan belanja dulu, lalu dibagi rata berdasarkan jumlah orangnya.
+
+Berikut adalah versi yang sudah di-upgrade. Desainnya menggunakan tema Dark Mode yang modern (kombinasi deep purple, black, dan sky blue) dengan efek kartu yang elegan. Di sini kamu tinggal memasukkan total nota belanjaan, lalu masukkan berapa orang yang ikut patungan, nanti sistem langsung menghitung otomatis.
+
+File: index.html
+HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipira Split Bill - Kalkulator Patungan Belanja</title>
+    <!-- Tailwind CSS modern development script -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Efek custom mesh gradient lembut untuk background */
+        .bg-mesh {
+            background-color: #0b0713;
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(147, 51, 234, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-mesh font-sans min-h-screen flex items-center justify-center p-4 text-gray-100">
+
+    <!-- Card Utama dengan Efek Glassmorphic Modern -->
+    <div class="bg-black/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-2xl shadow-2xl w-full max-w-md">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-sky-400">
+                SPLIT BILL CALCULATOR
+            </h1>
+            <p class="text-xs text-gray-400 mt-1">Hitung cepat total nota belanja & bagi rata patungan</p>
+        </div>
+
+        <!-- Form Input -->
+        <div class="space-y-4">
+            
+            <!-- Input Total Nota Belanja -->
+            <div>
+                <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    Total Uang / Nota Belanja (Rp)
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-gray-500 text-sm font-semibold">Rp</span>
+                    <input type="number" id="totalBelanja" placeholder="0" 
+                        class="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition">
+                </div>
+            </div>
+
+            <!-- Input Jumlah Orang -->
+            <div>
+                <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    Berapa Orang yang Ikut Patungan?
+                </label>
+                <div class="relative">
+                    <input type="number" id="jumlahOrang" placeholder="Contoh: 3" min="1"
+                        class="w-full px-4 py-2.5 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition">
+                    <span class="absolute right-3 top-2.5 text-gray-500 text-sm">Orang</span>
+                </div>
+            </div>
+
+            <!-- Tombol Hitung Sederhana -->
+            <button onclick="hitungPatungan()" 
+                class="w-full mt-2 bg-gradient-to-r from-purple-600 to-sky-500 hover:from-purple-500 hover:to-sky-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-900/20 transition duration-300 cursor-pointer text-sm tracking-wider uppercase">
+                Hitung Pembagian
+            </button>
+        </div>
+
+        <!-- Output Hasil Pembagian (Hidden secara default) -->
+        <div id="kartuHasil" class="hidden mt-6 p-4 rounded-xl bg-gradient-to-br from-purple-950/40 to-sky-950/40 border border-purple-500/30 animate-fade-in">
+            <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest mb-3 pb-1 border-b border-zinc-800">
+                Rincian Pembayaran
+            </h2>
+            
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between text-gray-400">
+                    <span>Total Nota Belanja:</span>
+                    <span id="outTotal" class="text-gray-200 font-semibold">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>Dibagi Untuk:</span>
+                    <span id="outOrang" class="text-gray-200 font-semibold">0 Orang</span>
+                </div>
+                
+                <div class="pt-3 border-t border-purple-500/20 flex justify-between items-center mt-2">
+                    <span class="text-white font-bold">Per Orang Bayar:</span>
+                    <span id="outPerOrang" class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-sky-400">
+                        Rp 0
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Logika JavaScript Perhitungan -->
+    <script>
+        function hitungPatungan() {
+            // Ambil element input & value
+            const totalBelanja = parseFloat(document.getElementById('totalBelanja').value);
+            const jumlahOrang = parseInt(document.getElementById('jumlahOrang').value);
+            const kartuHasil = document.getElementById('kartuHasil');
+
+            // Validasi sederhana jika input kosong atau tidak valid
+            if (isNaN(totalBelanja) || totalBelanja <= 0) {
+                alert("Masukkan total uang/nota belanja yang valid terlebih dahulu!");
+                return;
+            }
+            if (isNaN(jumlahOrang) || jumlahOrang <= 0) {
+                alert("Masukkan jumlah orang minimal 1 orang!");
+                return;
+            }
+
+            // Rumus Pembagian: Total Belanja / Jumlah Orang
+            const hasilPerOrang = totalBelanja / jumlahOrang;
+
+            // Format mata uang ke Rupiah tanpa desimal ribet
+            const formatRupiah = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+            });
+
+            // Pasang hasil kalkulasi ke elemen teks UI
+            document.getElementById('outTotal').innerText = formatRupiah.format(totalBelanja);
+            document.getElementById('outOrang').innerText = `${jumlahOrang} Orang`;
+            document.getElementById('outPerOrang').innerText = formatRupiah.format(hasilPerOrang);
+
+            // Munculkan kartu hasil dengan menghapus class 'hidden'
+            kartuHasil.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+Cara Memakai Aplikasi:
+Salin Semua Kode di atas, lalu masukkan ke dalam file text biasa dan simpan dengan nama file index.html.
+
+Jalankan File: Klik dua kali file tersebut, ia akan otomatis terbuka di browser HP atau laptopmu.
+
+Cara Kerja:
+
+Masukkan total nota belanjaan di kolom pertama (misal: habis 150000).
+
+Masukkan jumlah orang yang ikut makan/belanja di kolom kedua (misal: 3 orang).
+
+Klik tombol Hitung Pembagian, sistem langsung mengeluarkan rincian bahwa masing-masing orang wajib bayar Rp 50.000.
+
+Kaya gini contoh nya split bil belanja, tono | topup | 20.000
+
+Paham, berarti kamu butuh fitur Split Bill Itemized (Berdasarkan Pesanan/Daftar Belanjaan)! Jadi tiap orang dicatat namanya, apa yang dia beli/pesan (misal: top up, makan, atau barang tertentu), dan berapa harganya. Nanti sistem akan otomatis mengelompokkan total yang harus dibayar oleh masing-masing orang.
+
+Berikut adalah kode lengkapnya. Desainnya sudah disesuaikan dengan gaya favoritmu: Dark Mode modern dengan kombinasi warna deep purple, black, dan sky blue, serta efek kartu glassmorphism yang rapi dan responsif.
+
+File: index.html
+HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipira Split Bill - Nota Belanja Personal</title>
+    <!-- Tailwind CSS Script -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .bg-mesh {
+            background-color: #0b0713;
+            background-image: 
+                radial-gradient(at 5% 15%, rgba(147, 51, 234, 0.15) 0px, transparent 50%),
+                radial-gradient(at 95% 85%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-mesh font-sans min-h-screen text-gray-100 flex justify-center items-start p-4 md:p-8">
+
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-6 mt-4">
+        
+        <!-- KIRI: Form Input Barang/Belanjaan (47% lebar / 5 kolom) -->
+        <div class="md:col-span-5 bg-black/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-2xl shadow-2xl h-fit">
+            <div class="mb-6">
+                <h1 class="text-xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-sky-400 uppercase">
+                    🛒 Input Item Belanja
+                </h1>
+                <p class="text-xs text-gray-400 mt-1">Masukkan rincian belanjaan per orang</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Input Nama Orang -->
+                <div>
+                    <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-1.5">Nama Orang</label>
+                    <input type="text" id="inputNama" placeholder="Contoh: Tono" 
+                        class="w-full px-3 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition text-sm">
+                </div>
+
+                <!-- Input Deskripsi Barang -->
+                <div>
+                    <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-1.5">Barang / Deskripsi</label>
+                    <input type="text" id="inputBarang" placeholder="Contoh: Topup" 
+                        class="w-full px-3 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition text-sm">
+                </div>
+
+                <!-- Input Harga -->
+                <div>
+                    <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-1.5">Harga Uang (Rp)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-gray-500 text-sm font-semibold">Rp</span>
+                        <input type="number" id="inputHarga" placeholder="20000" 
+                            class="w-full pl-9 pr-3 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition text-sm">
+                    </div>
+                </div>
+
+                <!-- Tombol Tambah -->
+                <button onclick="tambahItem()" 
+                    class="w-full bg-gradient-to-r from-purple-600 to-sky-500 hover:from-purple-500 hover:to-sky-400 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition duration-200 cursor-pointer text-xs tracking-wider uppercase">
+                    + Tambahkan ke Bill
+                </button>
+            </div>
+        </div>
+
+        <!-- KANAN: Tabel Data & Hasil Patungan (53% lebar / 7 kolom) -->
+        <div class="md:col-span-7 space-y-6">
+            
+            <!-- List Seluruh Belanjaan -->
+            <div class="bg-black/40 backdrop-blur-xl border border-purple-500/20 p-5 rounded-2xl shadow-2xl">
+                <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest mb-3 pb-1 border-b border-zinc-800">
+                    Daftar Semua Belanjaan
+                </h2>
+                <div class="overflow-x-auto max-h-60 overflow-y-auto pr-1">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-zinc-800">
+                                <th class="py-2">Nama</th>
+                                <th class="py-2">Barang</th>
+                                <th class="py-2 text-right">Harga</th>
+                                <th class="py-2 text-center w-12">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelBelanjaan" class="divide-y divide-zinc-900">
+                            <!-- Data belanjaan masuk di sini via JS -->
+                            <tr id="placeholderRow" class="text-gray-500 italic">
+                                <td colspan="4" class="py-4 text-center">Belum ada item yang dimasukkan.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center text-sm">
+                    <span class="text-gray-400 font-medium">Grand Total Nota:</span>
+                    <span id="grandTotal" class="font-bold text-purple-400">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Hasil Summary Per Orang -->
+            <div class="bg-gradient-to-br from-purple-950/20 to-sky-950/20 backdrop-blur-xl border border-purple-500/30 p-5 rounded-2xl shadow-2xl">
+                <h2 class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3 pb-1 border-b border-zinc-800">
+                    Total Tagihan Per Orang (Siapa Bayar Berapa)
+                </h2>
+                <div id="containerHasil" class="space-y-2.5">
+                    <p class="text-xs text-gray-500 italic text-center py-2">Masukkan item terlebih dahulu untuk melihat kalkulasi.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Logika JavaScript Pemrosesan Data -->
+    <script>
+        // Array global untuk menampung list belanjaan
+        let listBelanja = [];
+
+        function tambahItem() {
+            const nama = document.getElementById('inputNama').value.trim();
+            const barang = document.getElementById('inputBarang').value.trim();
+            const harga = parseFloat(document.getElementById('inputHarga').value);
+
+            // Validasi Input
+            if (!nama) { alert("Nama orang tidak boleh kosong!"); return; }
+            if (!barang) { alert("Nama barang/deskripsi tidak boleh kosong!"); return; }
+            if (isNaN(harga) || harga <= 0) { alert("Masukkan harga barang yang valid!"); return; }
+
+            // Masukkan data ke array listBelanja
+            listBelanja.push({ nama, barang, harga });
+
+            // Reset form input barang & harga saja (nama dibiarkan agar jika orang yg sama beli barang lain tidak perlu ketik ulang)
+            document.getElementById('inputBarang').value = '';
+            document.getElementById('inputHarga').value = '';
+
+            // Update Tampilan Web
+            renderAplikasi();
+        }
+
+        function hapusItem(index) {
+            listBelanja.splice(index, 1);
+            renderAplikasi();
+        }
+
+        function renderAplikasi() {
+            const tabelBody = document.getElementById('tabelBelanjaan');
+            const containerHasil = document.getElementById('containerHasil');
+            const grandTotalText = document.getElementById('grandTotal');
+
+            // Format mata uang Rupiah Helper
+            const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', {
+                style: 'currency', currency: 'IDR', maximumFractionDigits: 0
+            }).format(angka);
+
+            // 1. RENDER TABEL SEMUA BELANJAAN
+            if (listBelanja.length === 0) {
+                tabelBody.innerHTML = `
+                    <tr id="placeholderRow" class="text-gray-500 italic">
+                        <td colspan="4" class="py-4 text-center">Belum ada item yang dimasukkan.</td>
+                    </tr>`;
+                grandTotalText.innerText = "Rp 0";
+                containerHasil.innerHTML = `<p class="text-xs text-gray-500 italic text-center py-2">Masukkan item terlebih dahulu untuk melihat kalkulasi.</p>`;
+                return;
+            }
+
+            let htmlTabel = '';
+            let totalNota = 0;
+            
+            // Objek untuk menampung akumulasi pengelompokan patungan per orang
+            let totalPerOrang = {};
+
+            listBelanja.forEach((item, index) => {
+                totalNota += item.harga;
+                
+                // Hitung akumulasi per nama orang
+                if (totalPerOrang[item.nama]) {
+                    totalPerOrang[item.nama] += item.harga;
+                } else {
+                    totalPerOrang[item.nama] = item.harga;
+                }
+
+                // Append ke HTML tabel
+                htmlTabel += `
+                    <tr class="hover:bg-zinc-900/50 transition">
+                        <td class="py-2.5 font-medium text-purple-300">${item.nama}</td>
+                        <td class="py-2.5 text-gray-300">${item.barang}</td>
+                        <td class="py-2.5 text-right font-semibold text-gray-100">${formatRupiah(item.harga)}</td>
+                        <td class="py-2.5 text-center">
+                            <button onclick="hapusItem(${index})" class="text-rose-400 hover:text-rose-300 cursor-pointer text-base">×</button>
+                        </td>
+                    </tr>`;
+            });
+
+            tabelBody.innerHTML = htmlTabel;
+            grandTotalText.innerText = formatRupiah(totalNota);
+
+            // 2. RENDER KARTU HASIL AKUMULASI PER ORANG
+            let htmlHasil = '';
+            for (let orang in totalPerOrang) {
+                htmlHasil += `
+                    <div class="flex justify-between items-center bg-black/30 border border-zinc-800/60 p-3 rounded-xl">
+                        <div>
+                            <span class="text-xs text-gray-400 block uppercase tracking-wider">Nama Anggota</span>
+                            <span class="text-sm font-bold text-white">${orang}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400 block">Total Bayar</span>
+                            <span class="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-sky-400">
+                                ${formatRupiah(totalPerOrang[orang])}
+                            </span>
+                        </div>
+                    </div>`;
+            }
+            containerHasil.innerHTML = htmlHasil;
+        }
+    </script>
+</body>
+</html>
+Fitur Unggulan di Versi Ini:
+Akumulasi Otomatis per Nama: Jika kamu memasukkan data Tono | Topup | 20.000 dan kemudian memasukkan lagi Tono | Es Teh | 5.000, sistem secara cerdas langsung menjumlahkan total tagihan milik Tono menjadi Rp 25.000 di kotak bagian bawah.
+
+Multi-person Tanpa Batas: Kamu bisa bebas memasukkan nama orang lain yang berbeda-beda (Tono, Andi, Siska, dll).
+
+Fitur Hapus Instan (Tombol ×): Jika salah menginput data barang atau harga, tinggal tekan tombol silang merah di ujung baris tabel untuk membatalkan item tersebut secara langsung.
+
+Sudah mencatat di bill ada kaya kertas bisa di Download
+
+Berikut adalah file website Split Bill v3 yang sudah saya lengkapi dengan fitur "Download Nota Kertas".
+
+Saya telah menghasilkan kodenya ke dalam file siap pakai di bawah ini. Ketika kamu menekan tombol 💾 Download Nota, aplikasi akan otomatis mengemas data pesanan dan kalkulasi pembagiannya menjadi file lembaran nota bergaya Struk Struk Kasir Thermal (Kertas Mini) lengkap dengan tombol print otomatis.
+
+Silakan unduh file website buatanmu di bawah ini:
+Ikon HTML
+ index 
+ HTML 
+
+Perubahan Utama & Fitur Baru pada Versi Ini:
+Tombol "Download Nota" Otomatis: Tombol ini akan otomatis muncul di pojok kanan atas bagian kartu "Total Tagihan Per Orang" begitu kamu mulai memasukkan data belanjaan.
+
+Desain Struk Kertas Kasir (Thermal Receipt): Saat tombol diunduh, sistem akan men-generate struk bersih berwarna putih dengan font ala mesin kasir (Courier New), garis putus-putus pembatas belanjaan, cap waktu real-time, akumulasi grand total belanjaan, hingga nominal bersih yang harus ditransfer oleh tiap orang.
+
+Fitur Print Langsung: Di dalam file kertas nota yang terdownload, sudah tersemat tombol "🖨️ Cetak / Print Struk". Jika dibuka di HP atau Laptop, kamu bisa langsung mencetaknya ke printer thermal mini, menyimpannya langsung sebagai file PDF, atau men-screenshot struk tersebut untuk langsung dikirimkan ke grup chat pertemanan.
+
+Visual Dashboard Tetap Konsisten: Dashboard utama aplikasi web kamu tetap menggunakan tema favoritmu, yaitu Dark Mode premium (deep purple, black, dan sky blue) dengan efek kaca glassmorphism transparan yang memanjakan mata.
+
+Cara Penggunaan:
+Klik dan download file index.html yang ada pada chip file di atas.
+
+Buka file tersebut di browser HP atau Laptopmu.
+
+Masukkan rincian pesanan (Misal: Tono | Topup | 20000, lalu klik tambah).
+
+Jika semua daftar belanjaan teman-teman sudah masuk, cukup klik tombol Download Nota untuk mengunduh kertas bukti tagihannya!
+
+
+
+
+Gemini adalah AI dan dapat melakukan kesalahan.
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipira Split Bill - Nota Belanja Personal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .bg-mesh {
+            background-color: #0b0713;
+            background-image: 
+                radial-gradient(at 5% 15%, rgba(147, 51, 234, 0.15) 0px, transparent 50%),
+                radial-gradient(at 95% 85%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+        }
+        /* Custom scrollbar style */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(147, 51, 234, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(147, 51, 234, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-mesh font-sans min-h-screen text-gray-100 flex justify-center items-start p-4 md:p-8">
+
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-6 mt-4">
+        
+        <!-- KIRI: Form Input Barang/Belanjaan -->
+        <div class="md:col-span-5 bg-black/40 backdrop-blur-xl border border-purple-500/20 p-6 rounded-2xl shadow-2xl h-fit">
+            <div class="mb-6">
+                <h1 class="text-xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-sky-400 uppercase">
+                    🛒 Input Item Belanja
+                </h1>
+                <p class="text-xs text-gray-400 mt-1">Masukkan rincian belanjaan per orang</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Input Nama Orang -->
+                <div>
+                    <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-1.5">Nama Orang</label>
+                    <input type="text" id="inputNama" placeholder="Contoh: Tono" 
+                        class="w-full px-3 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition text-sm">
+                </div>
+
+                <!-- Input Deskripsi Barang -->
+                <div>
+                    <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-1.5">Barang / Deskripsi</label>
+                    <input type="text" id="inputBarang" placeholder="Contoh: Topup" 
+                        class="w-full px-3 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition text-sm">
+                </div>
+
+                <!-- Input Harga -->
+                <div>
+                    <label class="block text-sky-400 text-xs font-bold uppercase tracking-wider mb-1.5">Harga Uang (Rp)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-gray-500 text-sm font-semibold">Rp</span>
+                        <input type="number" id="inputHarga" placeholder="20000" 
+                            class="w-full pl-9 pr-3 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl focus:outline-none focus:border-purple-500 text-white font-medium transition text-sm">
+                    </div>
+                </div>
+
+                <!-- Tombol Tambah -->
+                <button onclick="tambahItem()" 
+                    class="w-full bg-gradient-to-r from-purple-600 to-sky-500 hover:from-purple-500 hover:to-sky-400 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition duration-200 cursor-pointer text-xs tracking-wider uppercase">
+                    + Tambahkan ke Bill
+                </button>
+            </div>
+        </div>
+
+        <!-- KANAN: Tabel Data & Hasil Patungan -->
+        <div class="md:col-span-7 space-y-6">
+            
+            <!-- List Seluruh Belanjaan -->
+            <div class="bg-black/40 backdrop-blur-xl border border-purple-500/20 p-5 rounded-2xl shadow-2xl">
+                <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest mb-3 pb-1 border-b border-zinc-800">
+                    Daftar Semua Belanjaan
+                </h2>
+                <div class="overflow-x-auto max-h-60 overflow-y-auto pr-1">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-zinc-800">
+                                <th class="py-2">Nama</th>
+                                <th class="py-2">Barang</th>
+                                <th class="py-2 text-right">Harga</th>
+                                <th class="py-2 text-center w-12">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelBelanjaan" class="divide-y divide-zinc-900">
+                            <tr id="placeholderRow" class="text-gray-500 italic">
+                                <td colspan="4" class="py-4 text-center">Belum ada item yang dimasukkan.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center text-sm">
+                    <span class="text-gray-400 font-medium">Grand Total Nota:</span>
+                    <span id="grandTotal" class="font-bold text-purple-400">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Hasil Summary Per Orang + Fitur Cetak/Download Nota Kertas -->
+            <div class="bg-gradient-to-br from-purple-950/20 to-sky-950/20 backdrop-blur-xl border border-purple-500/30 p-5 rounded-2xl shadow-2xl relative">
+                <div class="flex justify-between items-center mb-3 pb-1 border-b border-zinc-800">
+                    <h2 class="text-xs font-bold text-purple-400 uppercase tracking-widest">
+                        Total Tagihan Per Orang
+                    </h2>
+                    <!-- Tombol Download Kertas Nota -->
+                    <button onclick="downloadNotaKertas()" id="btnDownload" class="hidden text-xs bg-sky-600 hover:bg-sky-500 text-white font-bold py-1 px-3 rounded-lg shadow transition duration-200 cursor-pointer uppercase tracking-wider">
+                        💾 Download Nota
+                    </button>
+                </div>
+                
+                <div id="containerHasil" class="space-y-2.5">
+                    <p class="text-xs text-gray-500 italic text-center py-2">Masukkan item terlebih dahulu untuk melihat kalkulasi.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- AREA TERSEMBUNYI: Template Struktur Kertas Nota Kasir Mini untuk di-Download -->
+    <div id="notaCetakTemplate" class="hidden">
+        <div style="width: 300px; padding: 20px; background: #ffffff; color: #000000; font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.4;">
+            <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+                <h3 style="margin: 0; font-size: 16px; font-weight: bold;">SIPIRA SPLIT BILL</h3>
+                <p style="margin: 4px 0 0 0; font-size: 10px;">Nota Pembagian Patungan Belanja</p>
+                <p id="notaTanggal" style="margin: 2px 0 0 0; font-size: 9px; color: #555;"></p>
+            </div>
+            
+            <div style="margin-bottom: 8px; font-weight: bold;">RINCIAN BARANG:</div>
+            <div id="notaListBarang" style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 10px;">
+                <!-- Diisi via JS -->
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 12px;">
+                <span>GRAND TOTAL:</span>
+                <span id="notaGrandTotal">Rp 0</span>
+            </div>
+
+            <div style="margin-bottom: 6px; font-weight: bold; border-top: 1px dashed #000; padding-top: 8px;">TAGIHAN PER ANGGOTA:</div>
+            <div id="notaListOrang" style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 10px;">
+                <!-- Diisi via JS -->
+            </div>
+
+            <div style="text-align: center; font-size: 10px; margin-top: 15px; color: #333;">
+                Terima kasih atas kerjasamanya!<br>Semoga rezekinya lancar selalu.
+            </div>
+        </div>
+    </div>
+
+    <!-- Logika JavaScript Pemrosesan Data -->
+    <script>
+        let listBelanja = [];
+
+        function tambahItem() {
+            const nama = document.getElementById('inputNama').value.trim();
+            const barang = document.getElementById('inputBarang').value.trim();
+            const harga = parseFloat(document.getElementById('inputHarga').value);
+
+            if (!nama) { alert("Nama orang tidak boleh kosong!"); return; }
+            if (!barang) { alert("Nama barang/deskripsi tidak boleh kosong!"); return; }
+            if (isNaN(harga) || harga <= 0) { alert("Masukkan harga barang yang valid!"); return; }
+
+            listBelanja.push({ nama, barang, harga });
+
+            document.getElementById('inputBarang').value = '';
+            document.getElementById('inputHarga').value = '';
+
+            renderAplikasi();
+        }
+
+        function hapusItem(index) {
+            listBelanja.splice(index, 1);
+            renderAplikasi();
+        }
+
+        function renderAplikasi() {
+            const tabelBody = document.getElementById('tabelBelanjaan');
+            const containerHasil = document.getElementById('containerHasil');
+            const grandTotalText = document.getElementById('grandTotal');
+            const btnDownload = document.getElementById('btnDownload');
+
+            const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', {
+                style: 'currency', currency: 'IDR', maximumFractionDigits: 0
+            }).format(angka);
+
+            if (listBelanja.length === 0) {
+                tabelBody.innerHTML = `
+                    <tr id="placeholderRow" class="text-gray-500 italic">
+                        <td colspan="4" class="py-4 text-center">Belum ada item yang dimasukkan.</td>
+                    </tr>`;
+                grandTotalText.innerText = "Rp 0";
+                containerHasil.innerHTML = `<p class="text-xs text-gray-500 italic text-center py-2">Masukkan item terlebih dahulu untuk melihat kalkulasi.</p>`;
+                btnDownload.classList.add('hidden');
+                return;
+            }
+
+            // Munculkan tombol download jika ada data
+            btnDownload.classList.remove('hidden');
+
+            let htmlTabel = '';
+            let totalNota = 0;
+            let totalPerOrang = {};
+
+            listBelanja.forEach((item, index) => {
+                totalNota += item.harga;
+                
+                if (totalPerOrang[item.nama]) {
+                    totalPerOrang[item.nama] += item.harga;
+                } else {
+                    totalPerOrang[item.nama] = item.harga;
+                }
+
+                htmlTabel += `
+                    <tr class="hover:bg-zinc-900/50 transition">
+                        <td class="py-2.5 font-medium text-purple-300">${item.nama}</td>
+                        <td class="py-2.5 text-gray-300">${item.barang}</td>
+                        <td class="py-2.5 text-right font-semibold text-gray-100">${formatRupiah(item.harga)}</td>
+                        <td class="py-2.5 text-center">
+                            <button onclick="hapusItem(${index})" class="text-rose-400 hover:text-rose-300 cursor-pointer text-base">×</button>
+                        </td>
+                    </tr>`;
+            });
+
+            tabelBody.innerHTML = htmlTabel;
+            grandTotalText.innerText = formatRupiah(totalNota);
+
+            let htmlHasil = '';
+            for (let orang in totalPerOrang) {
+                htmlHasil += `
+                    <div class="flex justify-between items-center bg-black/30 border border-zinc-800/60 p-3 rounded-xl">
+                        <div>
+                            <span class="text-xs text-gray-400 block uppercase tracking-wider">Nama Anggota</span>
+                            <span class="text-sm font-bold text-white">${orang}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400 block">Total Bayar</span>
+                            <span class="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-sky-400">
+                                ${formatRupiah(totalPerOrang[orang])}
+                            </span>
+                        </div>
+                    </div>`;
+            }
+            containerHasil.innerHTML = htmlHasil;
+        }
+
+        // Fungsi Otomatis generate Nota Kertas Fisik bergaya struk kasir thermal (.html atau file gambar semu)
+        function downloadNotaKertas() {
+            if (listBelanja.length === 0) return;
+
+            const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', {
+                style: 'currency', currency: 'IDR', maximumFractionDigits: 0
+            }).format(angka);
+
+            // Set Tanggal saat ini
+            const opsiWaktu = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('notaTanggal').innerText = new Date().toLocaleDateString('id-ID', opsiWaktu) + " WIB";
+
+            // List Rincian Barang Belanjaan
+            let htmlNotaBarang = '';
+            let totalNota = 0;
+            let totalPerOrang = {};
+
+            listBelanja.forEach(item => {
+                totalNota += item.harga;
+                if (totalPerOrang[item.nama]) {
+                    totalPerOrang[item.nama] += item.harga;
+                } else {
+                    totalPerOrang[item.nama] = item.harga;
+                }
+
+                htmlNotaBarang += `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
+                    <span>${item.nama} - ${item.barang}</span>
+                    <span>${formatRupiah(item.harga)}</span>
+                </div>`;
+            });
+            document.getElementById('notaListBarang').innerHTML = htmlNotaBarang;
+            document.getElementById('notaGrandTotal').innerText = formatRupiah(totalNota);
+
+            // List Pembagian Per Orang
+            let htmlNotaOrang = '';
+            for (let orang in totalPerOrang) {
+                htmlNotaOrang += `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; font-weight: bold;">
+                    <span>👤 ${orang}</span>
+                    <span>${formatRupiah(totalPerOrang[orang])}</span>
+                </div>`;
+            }
+            document.getElementById('notaListOrang').innerHTML = htmlNotaOrang;
+
+            // Ambil element HTML struk kasir
+            const kontenStruk = document.getElementById('notaCetakTemplate').innerHTML;
+
+            // Buat file Blob HTML agar langsung terdownload sebagai "Kertas Nota Fisik"
+            const blob = new Blob([`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Nota Fisik Split Bill</title>
+                    <style>
+                        body { display: flex; justify-content: center; align-items: center; background: #e0e0e0; padding: 20px; margin:0; }
+                        .nota-box { box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-radius: 4px; }
+                        @media print {
+                            body { background: #fff; padding: 0; }
+                            .nota-box { box-shadow: none; }
+                            #btnCetak { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap: 10px;">
+                        <button id="btnCetak" onclick="window.print()" style="padding: 8px 16px; font-weight:bold; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;">🖨️ Cetak / Print Struk</button>
+                        <div class="nota-box">${kontenStruk}</div>
+                    </div>
+                </body>
+                </html>
+            `], { type: 'text/html' });
+
+            // Trigger download file
+            const linkDownload = document.createElement('a');
+            linkDownload.href = URL.createObjectURL(blob);
+            linkDownload.download = `Nota_Kertas_SplitBill_${Date.now()}.html`;
+            document.body.appendChild(linkDownload);
+            linkDownload.click();
+            document.body.removeChild(linkDownload);
+        }
+    </script>
+</body>
+</html>
